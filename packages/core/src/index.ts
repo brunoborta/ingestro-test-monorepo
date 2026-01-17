@@ -1,6 +1,12 @@
 // Parser
 export { parseJSON } from './parser';
 
+// Validator
+export { required, isNumber, isString, range, compose } from './validator';
+
+// Store
+export { createStore } from './store';
+
 // Types
 export type {
   CellValue,
@@ -8,4 +14,7 @@ export type {
   ColumnDefinition,
   DataRow,
   ParsedData,
+  ValidationResult,
+  ValidationRule,
 } from './types';
+
