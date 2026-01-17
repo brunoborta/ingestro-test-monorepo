@@ -12,10 +12,16 @@ describe('parseJSON', () => {
 
     const result = await parseJSON(file);
 
-    expect(result).toEqual([
-      { name: 'Borta', age: 37 },
-      { name: 'Luana', age: 43 }
-    ]);
+    expect(result).toHaveProperty('columns');
+    expect(result).toHaveProperty('rows');
+
+    // Check we have 2 columns (name, age)
+    expect(result.columns).toHaveLength(2);
+
+    // Check we have 2 rows
+    expect(result.rows).toHaveLength(2);
+    expect(result.rows[0]!.data).toEqual({ name: 'Borta', age: 37 });
+    expect(result.rows[1]!.data).toEqual({ name: 'Luana', age: 43 });
   });
 
   it('should throw error for invalid JSON', async () => {
@@ -44,6 +50,40 @@ describe('parseJSON', () => {
 
     await expect(parseJSON(file)).rejects.toThrow();
   });
+
+  it('should return structured data with columns and rows', async () => {
+    const jsonData = JSON.stringify([
+      { name: 'John', age: 25, active: true },
+      { name: 'Jane', age: 30, active: false }
+    ]);
+
+    const file = new File([jsonData], 'test.json', { type: 'application/json' });
+    const result = await parseJSON(file);
+
+    // Check structure
+    expect(result).toHaveProperty('columns');
+    expect(result).toHaveProperty('rows');
+
+    // Check columns
+    expect(result.columns).toHaveLength(3);
+    expect(result.columns).toEqual([
+      { id: 'name', name: 'name', type: 'string' },
+      { id: 'age', name: 'age', type: 'number' },
+      { id: 'active', name: 'active', type: 'boolean' }
+    ]);
+
+    // Check rows
+    expect(result.rows).toHaveLength(2);
+    expect(result.rows[0]).toMatchObject({
+      id: 'row-0',
+      data: { name: 'John', age: 25, active: true }
+    });
+    expect(result.rows[1]).toMatchObject({
+      id: 'row-1',
+      data: { name: 'Jane', age: 30, active: false }
+    });
+  });
+
 });
 
 describe('isFlatObject', () => {

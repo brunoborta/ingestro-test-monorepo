@@ -1,6 +1,6 @@
+import { ColumnType, ParsedData } from "../types";
 
-
-export async function parseJSON(file: File) {
+export async function parseJSON(file: File): Promise<ParsedData> {
   // basic size limits (10mb)
   if (file.size > 10 * 1024 * 1024) {
     throw new Error('File exceeds 10mb limit')
@@ -29,7 +29,32 @@ export async function parseJSON(file: File) {
     throw new Error('Nested objects/arrays not supported');
   }
 
-  return data;
+  // End of checks, start to normalize the data
+
+  const columnMap = new Map<string, ColumnType>();
+  data.forEach(row => {
+    Object.entries(row).forEach(([key, value]) => {
+      const inferredType = inferType(value);
+      const previousColumnType = columnMap.get(key);
+      // Update if no type yet or type is unknown
+      if(!previousColumnType || previousColumnType === 'unknown') {
+        columnMap.set(key, inferredType)
+      }
+    })
+  })
+
+  const columns = Array.from(columnMap.entries()).map(([key, type]) => ({
+    id: key,
+    name: key,
+    type
+  }))
+
+  const rows = data.map((item, index) => ({
+    id: `row-${index}`,
+    data: item
+  }))
+
+  return { columns, rows };
 }
 
 export function isFlatObject(obj: unknown): boolean {
@@ -41,4 +66,25 @@ export function isFlatObject(obj: unknown): boolean {
   return Object.values(obj).every(value => {
     return value === null || typeof value !== 'object' || value instanceof Date;
   });
+}
+
+// More scalable than go with typeof + handle null and ISO dates
+function inferType(value: unknown): ColumnType {
+  if (value === null || value === undefined) {
+    return 'unknown';
+  }
+
+  if (typeof value === 'string') {
+    // Check if it's a ISO date string
+    if (/^\d{4}-\d{2}-\d{2}/.test(value) && !isNaN(Date.parse(value))) {
+      return 'date';
+    }
+    return 'string';
+  }
+
+  if (typeof value === 'number') return 'number';
+  if (typeof value === 'boolean') return 'boolean';
+  if (value instanceof Date) return 'date';
+
+  return 'unknown';
 }
