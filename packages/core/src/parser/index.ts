@@ -1,6 +1,6 @@
 import { ColumnType, ParsedData } from "../types";
 
-export async function parseJSON(file: File): Promise<ParsedData> {
+export const parseJSON = async (file: File): Promise<ParsedData> => {
   // basic size limits (10mb)
   if (file.size > 10 * 1024 * 1024) {
     throw new Error('File exceeds 10mb limit')
@@ -57,7 +57,7 @@ export async function parseJSON(file: File): Promise<ParsedData> {
   return { columns, rows };
 }
 
-export function isFlatObject(obj: unknown): boolean {
+export const isFlatObject = (obj: unknown): boolean => {
   // everything other than object (including array) is rejected
   if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
     return false;
@@ -69,7 +69,7 @@ export function isFlatObject(obj: unknown): boolean {
 }
 
 // More scalable than go with typeof + handle null and ISO dates
-function inferType(value: unknown): ColumnType {
+const inferType = (value: unknown): ColumnType => {
   if (value === null || value === undefined) {
     return 'unknown';
   }

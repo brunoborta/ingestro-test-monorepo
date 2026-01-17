@@ -19,3 +19,14 @@ export interface ParsedData {
   columns: ColumnDefinition[];
   rows: DataRow[];
 }
+
+// Validation types
+export interface ValidationResult {
+  valid: boolean;
+  error?: string;
+}
+
+export type ValidationRule = (
+  value: CellValue,
+  row?: DataRow
+) => ValidationResult;
