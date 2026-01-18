@@ -1,12 +1,37 @@
 {
   "name": "@ingestro/react",
   "version": "1.0.0",
-  "description": "Spreadsheet-like Review UI",
-  "main": "index.js",
+  "description": "React components for Ingestro SDK",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "vitest"
+    "build": "tsup",
+    "dev": "tsup --watch"
   },
   "keywords": [],
   "author": "Bruno 'Borta' Bortagaray",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@ingestro/core": "workspace:^"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.8",
+    "react": "^19.2.3",
+    "tsup": "^8.5.1"
+  }
 }
