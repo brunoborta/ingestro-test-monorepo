@@ -30,7 +30,6 @@ export const parseJSON = async (file: File): Promise<ParsedData> => {
   }
 
   // End of checks, start to normalize the data
-
   const columnMap = new Map<string, ColumnType>();
   data.forEach(row => {
     Object.entries(row).forEach(([key, value]) => {
