@@ -1,12 +1,17 @@
 import { createContext, ReactNode, useContext, useMemo } from 'react';
-import { createStore } from '@ingestro/core';
+import { createStore, ValidationRule } from '@ingestro/core';
 
 type Store = ReturnType<typeof createStore>;
 
+interface IngestroProviderProps {
+  children: ReactNode;
+  rules?: Record<string, ValidationRule>
+}
+
 const IngestroContext = createContext<Store | null>(null);
 
-export const IngestroProvider = ({ children }: { children: ReactNode }) => {
-  const store = useMemo(() => createStore(), []);
+export const IngestroProvider = ({ children, rules }: IngestroProviderProps) => {
+  const store = useMemo(() => createStore(rules), [rules]);
 
   return (
     <IngestroContext.Provider value={store}>
