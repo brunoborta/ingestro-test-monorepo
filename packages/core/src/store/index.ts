@@ -1,6 +1,6 @@
-import { CellValue, ParsedData } from "../types"
+import { CellValue, ParsedData, ValidationRule } from "../types"
 
-export const createStore = () => {
+export const createStore = (rules: Record<string, ValidationRule> = {}) => {
   // Closure to hold state
   let data: ParsedData | null = null;
   let listeners: Array<(data: ParsedData) => void> = [];
@@ -32,6 +32,20 @@ export const createStore = () => {
       const row = data.rows.find(r => r.id === rowId);
       if(row) {
         row.data[columnId] = value;
+        // Look for validation of the type of column
+        const columnValidator = rules[columnId];
+        if(columnValidator) {
+        // See if the new value is valid
+          const result = columnValidator(value, row);
+          if(!row.errors) {
+            row.errors = {}
+          }
+          if(!result.valid && result.error) {
+            row.errors[columnId] = result.error;
+          } else {
+            delete row.errors[columnId];
+          }
+        }
         notify();
       }
     },
