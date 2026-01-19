@@ -50,12 +50,18 @@ export const DataTable = () => {
                   const isEditing = editingCell?.rowId === row.id && editingCell?.columnId === column.id;
                   const hasError = !!row.errors?.[column.id];
                   return (
-                    <td className={`row ${hasError ? 'error' : ''} ${isEditing ? 'editing' : ''}`}
+                    <td className={`row ${hasError ? 'error' : ''} ${isEditing && column.type !== 'boolean' ? 'editing' : ''}`}
                       key={column.id}
                       onClick={() => setEditingCell({ rowId: row.id, columnId: column.id })}
                       title={hasError ? row.errors?.[column.id] : undefined}
                     >
-                      {isEditing ? (
+                      {column.type === 'boolean' ? (
+                        <input
+                          type="checkbox"
+                          checked={Boolean(row.data[column.id])}
+                          onChange={e => store.updateCell(row.id, column.id, e.target.checked)}
+                        />
+                      ) : isEditing ? (
                         <ActiveCellInput
                           initialValue={row.data[column.id]}
                           onCommit={handleUpdate(row.id, column.id, column.type)}

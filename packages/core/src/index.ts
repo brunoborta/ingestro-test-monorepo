@@ -2,7 +2,7 @@
 export { parseJSON } from './parser';
 
 // Validator
-export { required, isNumber, isString, range, compose } from './validator';
+export { required, isNumber, isBoolean, isString, isDate, range, compose } from './validator';
 
 // Store
 export { createStore } from './store';

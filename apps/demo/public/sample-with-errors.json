@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Valid User",
+    "email": "valid@example.com",
+    "age": 25
+  },
+  {
+    "name": "",
+    "email": "missing-name@example.com",
+    "age": 30
+  },
+  {
+    "name": "Too Old",
+    "email": "old@example.com",
+    "age": 150
+  },
+  {
+    "name": "Invalid Age",
+    "email": "invalid@example.com",
+    "age": "not-a-number"
+  }
+]

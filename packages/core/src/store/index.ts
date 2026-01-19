@@ -13,6 +13,22 @@ export const createStore = (rules: Record<string, ValidationRule> = {}) => {
   return {
     loadData: (parsedData: ParsedData) => {
       data = parsedData;
+
+      // Validate immediately after loading
+      data.rows.forEach(row => {
+        data!.columns.forEach(column => {
+          const validator = rules[column.id];
+          if (validator) {
+            const result = validator(row.data[column.id]!, row);
+            if (!row.errors) row.errors = {};
+            if (!result.valid && result.error) {
+              row.errors[column.id] = result.error;
+            } else {
+              delete row.errors[column.id];
+            }
+          }
+        });
+      });
       notify();
     },
 

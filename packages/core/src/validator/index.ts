@@ -41,6 +41,20 @@ export const isNumber = (): ValidationRule => {
   }
 }
 
+export const isBoolean = (): ValidationRule => {
+  return (value: CellValue) => {
+    if(typeof value !== 'boolean') {
+      return {
+        valid: false,
+        error: 'Value must be a boolean'
+      };
+    }
+    return {
+      valid: true
+    }
+  }
+}
+
 export const isString = (): ValidationRule => {
   return (value: CellValue) => {
     if (typeof value !== 'string') {
@@ -52,6 +66,30 @@ export const isString = (): ValidationRule => {
     return {
       valid: true
     };
+  };
+};
+
+export const isDate = (): ValidationRule => {
+  return (value: CellValue) => {
+    if (typeof value !== 'string') {
+      return {
+        valid: false,
+        error: 'Value must be a date string (YYYY-MM-DD)'
+      };
+    }
+
+    // ISO format: YYYY-MM-DD
+    const isValidFormat = /^\d{4}-\d{2}-\d{2}/.test(value);
+    const isValidDate = !isNaN(Date.parse(value));
+
+    if (!isValidFormat || !isValidDate) {
+      return {
+        valid: false,
+        error: 'Value must be a valid date (YYYY-MM-DD)'
+      };
+    }
+
+    return { valid: true };
   };
 };
 

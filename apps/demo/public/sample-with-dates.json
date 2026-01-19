@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Alice",
+    "email": "alice@example.com",
+    "age": 28,
+    "birthDate": "1996-05-15",
+    "active": true
+  },
+  {
+    "name": "Bob",
+    "email": "bob@example.com",
+    "age": 35,
+    "birthDate": "1989-11-22",
+    "active": false
+  },
+  {
+    "name": "Charlie",
+    "email": "charlie@example.com",
+    "age": 42,
+    "birthDate": "1982-03-08",
+    "active": true
+  }
+]
