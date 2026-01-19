@@ -1,6 +1,6 @@
 {
-  "name": "@ingestro/core",
-  "version": "1.0.0",
+  "name": "@borta/core",
+  "version": "1.0.1",
   "description": "Framework-agnostic import & review SDK",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -13,7 +13,9 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
