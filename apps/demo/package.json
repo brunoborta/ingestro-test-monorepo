@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ingestro/core": "workspace:^",
-    "@ingestro/react": "workspace:^",
+    "@borta/core": "workspace:^",
+    "@borta/react": "workspace:^",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

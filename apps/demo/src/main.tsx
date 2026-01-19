@@ -1,9 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { IngestroProvider } from '@ingestro/react'
+import { IngestroProvider } from '@borta/react'
 import App from './App.tsx'
 
-import { isNumber, isBoolean, required, compose, range, isDate } from '@ingestro/core';
+import { isNumber, isBoolean, required, compose, range, isDate } from '@borta/core';
 
 // Dictionary of rules that can be composed
 const rules = {

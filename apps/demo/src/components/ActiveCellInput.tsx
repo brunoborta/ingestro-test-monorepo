@@ -1,4 +1,4 @@
-import { type CellValue } from '@ingestro/core';
+import { type CellValue } from '@borta/core';
 import { useState, type ChangeEvent } from 'react';
 
 interface ActiveCellInputProps {

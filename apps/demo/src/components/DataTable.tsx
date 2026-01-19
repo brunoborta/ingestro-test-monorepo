@@ -1,4 +1,4 @@
-import { useIngestro, useIngestroData } from "@ingestro/react"
+import { useIngestro, useIngestroData } from "@borta/react"
 import { useState } from "react";
 import { ActiveCellInput } from "./ActiveCellInput";
 

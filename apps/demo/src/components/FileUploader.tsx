@@ -1,5 +1,5 @@
-import { parseJSON } from "@ingestro/core";
-import { useIngestro } from "@ingestro/react";
+import { parseJSON } from "@borta/core";
+import { useIngestro } from "@borta/react";
 import { useState } from "react";
 
 export const FileUploader = () => {
