@@ -23,10 +23,10 @@ importers:
 
   apps/demo:
     dependencies:
-      '@ingestro/core':
+      '@borta/core':
         specifier: workspace:^
         version: link:../../packages/core
-      '@ingestro/react':
+      '@borta/react':
         specifier: workspace:^
         version: link:../../packages/react
       react:
@@ -81,7 +81,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@ingestro/core':
+      '@borta/core':
         specifier: workspace:^
         version: link:../core
     devDependencies:
