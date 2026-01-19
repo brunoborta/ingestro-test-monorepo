@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useMemo } from 'react';
-import { createStore, ValidationRule } from '@ingestro/core';
+import { createStore, ValidationRule } from '@borta/core';
 
 type Store = ReturnType<typeof createStore>;
 
@@ -11,7 +11,7 @@ interface IngestroProviderProps {
 const IngestroContext = createContext<Store | null>(null);
 
 export const IngestroProvider = ({ children, rules }: IngestroProviderProps) => {
-  const store = useMemo(() => createStore(rules), [rules]);
+  const store = useMemo(() => createStore(rules ?? {}), [rules]);
 
   return (
     <IngestroContext.Provider value={store}>

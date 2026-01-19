@@ -1,6 +1,6 @@
 {
-  "name": "@ingestro/react",
-  "version": "1.0.0",
+  "name": "@borta/react",
+  "version": "1.0.1",
   "description": "React components for Ingestro SDK",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -24,7 +24,7 @@
   "author": "Bruno 'Borta' Bortagaray",
   "license": "ISC",
   "dependencies": {
-    "@ingestro/core": "workspace:^"
+    "@borta/core": "workspace:^"
   },
   "peerDependencies": {
     "react": "^18.0.0"

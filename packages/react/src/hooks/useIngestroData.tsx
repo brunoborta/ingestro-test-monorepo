@@ -1,4 +1,4 @@
-import { ParsedData } from "@ingestro/core";
+import { ParsedData } from "@borta/core";
 import { useIngestro } from "../IngestroProvider";
 import { useEffect, useState } from "react";
 
