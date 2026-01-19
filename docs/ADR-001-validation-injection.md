@@ -4,102 +4,45 @@
 
 ## Context
 
-I am building a data import SDK that imports a JSON file (an array of objects) and lets the user see and correct the data in a spreadsheet UI.
-The validation rules vary per customer/dataset. A generic example is type validation (age being a number, name being a string, etc), or domain rules (email must have a valid domain, postal code depends on a country, etc).
-That said, I looked for a approach that:
-- would keep the Core package framework-agnostic.
-- avoid baking business rules into the SDK.
-- produces a single source of truth for both errors and data.
-- support interactive cell-level editing as a Core requirement.
+We are building a data import SDK that allows users to review and correct uploaded data.
 
-There were several approaches I considered. Here are them:
+The core challenge is that **validation rules vary wildly** between different datasets. One customer might need simple type checking (e.g., "Age is a number"), while another needs complex domain logic (e.g., "SKUs must start with 'X-'").
 
-## Options Considered
-### Option 1: Hardcoded or Inferred Rules in Core
-The Core automatically applies a fixed set of validators based on inferred column types.
+We needed a way to support these custom rules without:
+1.  Baking business logic into the generic SDK.
+2.  Locking the validation logic inside a UI framework like React (ADR-003).
 
-**Why this is good?**
-- Minimal configuration for customers.
-- Works for basic type checks.
+## The Choices
 
-**What are the consequences?**
-- Validation behavior is derived from inferred types, which is often not reliable for imported data.
-- Adding domain-specific rules require SDK changes and releases.
-- The Core API surface grows over time, increasing maintenance cost.
-- Core would need to know business logic, which is not appropriate for a lightweight reusable SDK.
+We considered **Hardcoded or Inferred Rules**.
+It would be easiest to just let the parser guess ("This looks like a number") and enforce it. But inferred types are often wrong for real-world messy data, and this approach breaks down immediately when you need something specific like email validation.
 
-### Option 2: Injected Validation Rules via the Core Store (Dependency Injection)
-The consumers provide a map of validation rules when creating the Core store. Rules are sent as composable functions in a dictionary object and executed by the Core.
+We considered **Validation in React**.
+We could have just let the React components validate the data before saving. This is easy to build, but it means our `core` business logic is no longer safe or portable. If we ever moved to Vue or a headless script, we'd lose all our validation rules.
 
-**Why this is good?**
-- Core remains generic and reusable.
-- Business rules stay with the consumer.
-- Validation is centralized and consistent across all consumers.
-- Validation logic is very easy to test.
+We also looked at **Schema Libraries (Zod, Yup)**.
+These are excellent for validating full objects. However, a spreadsheet UI is inherently cell-based. You want to validate *this specific cell* when the user types. Mapping a full-row Zod schema error back to a specific cell in a grid can get complicated quickly.
 
-**What are the consequences?**
-- Consumers must explicitly define rules for non-trivial validation.
-- Validation behaviour must be clearly documented.
-- Rules are configured at store creation time (change of rules must create the store again).
+## The Decision
 
-### Option 3: Validation in React Only
-Validation logic lives inside React components and runs before updating Core state.
+We chose **Injected Validation Rules (Dependency Injection)**.
 
-**Why this is good?**
-- Fast to implement.
-- Easy access to UI state.
+When you create the store, you pass in a map of validation rules.
+The Core doesn't know *what* "valid" means, it just knows *how* to run the functions you give it.
 
-**What are the consequences?**
-- Violates the framework-agnostic requirement of the Core package.
-- Allows Core state to become invalid when used outside React.
-- Creates multiple sources of truth for validation.
-- Makes Core harder to test and reuse.
-
-### Option 4: Schema-Based Validation
-Consumers provide a declarative schema describing valid data, and the Core validates against it.
-
-**Why this is good?**
-- Strong, declarative constraints.
-- Good fit for template-based or backend-shared validation.
-
-**What are the consequences?**
-- Introduces a heavier dependency and API commitment.
-- Validation is typically row- or object-based, not naturally cell-based.
-- Mapping schema errors to a spreadsheet UI adds complexity.
-- Less flexible for interactive editing.
-
-## Decision
-
-I chose **Option 2: Injected Validation Rules via the Core Store (Dependency Injection)**.
-This project is fundamentally about reviewing and correcting imported data, not just validating. So validation rules need to reflect domain intent (e.g. "this column represents name") rather than parser heuristics or inferred types.
-By injecting validation rules into the Core store, we keep the SDK generic while allowing consumers to define what "valid" means for their specific use case. The Core remains responsible for _when_ validation runs and _how_ errors are stored, but not for _which_ business rules apply.
-Validation is executed inside the Core during `updateCell` and initial `loadData`, ensuring that all consumers (React or other frameworks) observe the same data and error state.
-
-The `createStore` function accepts a `rules` map:
 ```typescript
 const store = createStore({
   age: compose(required(), isNumber(), range(0, 100))
 });
 ```
 
-This approach aligns well with the interactive, spreadsheet UI where validation needs to happen at the point of edit and map cleanly to individual cells.
+This gives us the best of both worlds:
+1.  **The SDK is generic**: It doesn't contain your business logic.
+2.  **The Logic is central**: Validation runs inside the Core, so it works exactly the same in React, Vue, or CLI scripts.
+3.  **It supports "Fix Later"**: Unlike a rigid schema that might reject a whole row, our store accepts the invalid value but flags it with an error, allowing the user to correct it in the UI.
 
 ## Consequences
 
-#### 1. Single Source of Truth for Data and Errors: 
-All validation happens inside the Core store. Regardless of whether data is updated through React, a future non-React consumer, or direct store APIs, the resulting error state is consistent and centralized.
-
-#### 2. Extensibility Without Core Changes: 
-Validation rules are treated as consumer-owned business logic. New constraints can be added or changed without modifying or republishing the SDK, keeping the Core small and reusable.
-
-#### 3. Framework-Agnostic by Design:
-Validation logic is implemented as pure Javascript / Typescript functions with no dependency on React or any other lib. The React package acts purely as an adapter that renders state and dispatches edit intents.
-
-#### 4. Invalid Values Are Stored Alongside Errors:
-The store accepts user edits even when they are invalid and records validation errors separately. This supports a review and correct workflow where users can freely edit data and resolve issues incrementally.
-
-#### 5. Rules Are Bound to the Store Lifecycle:
-Validation rules are configured when the store is created and are treated as stable configuration. Changing rules dynamically would require recreating the store or extending the API (e.g. with a `setRules` method), which is an accepted trade-off for a simpler and more predictable core API.
-
-#### 6. Cell-Level Validation by Default: 
-On edits, only the affected cell is revalidated. While validators can inspect the full row, dependent-field revalidation is not automatic and would require additional mechanisms if needed.
+*   **Configuration**: Consumer have to define the rules when initialize the store.
+*   **Single Source of Truth**: The store holds both the data and the error state.
+*   **Framework Agnostic**: The validation functions are just pure JavaScript, with no dependencies.
